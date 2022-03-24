@@ -9,6 +9,8 @@ namespace CustomerClient
 {
 	class Program
 	{
+		///https://eddyf1xxxer.medium.com/bi-directional-streaming-and-introduction-to-grpc-on-asp-net-core-3-0-part-2-d9127a58dcdb
+
 		static async Task Main(string[] args)
 		{
 			AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
@@ -26,8 +28,12 @@ namespace CustomerClient
 			{
 				Customer = customer 
 			});
-			
-			using (var streaming = client.SendMessageToChatRoom(new Metadata { new Metadata.Entry("CustomerName", customer.Name) }))
+
+			using (var streaming = client.SendMessageToChatRoom(
+				new Metadata
+				{ new Metadata.Entry("CustomerName", customer.Name) },
+				deadline: DateTime.UtcNow.AddSeconds(5)))
+
 			{
 				var response = Task.Run(async () =>
 				{
